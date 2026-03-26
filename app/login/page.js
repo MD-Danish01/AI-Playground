@@ -8,14 +8,14 @@ const Login = () => {
         className="mx-auto items-center justify-center h-screen w-full flex"
         action={async () => {
           "use server";
-          await signIn("google");
+          await signIn("google", {redirectTo: "/chat"});
         }}
       >
         <button
           className="bg-white hover:bg-gray-50 text-black text-xl font-light py-2 px-8 rounded flex gap-4"
           type="submit"
         >
-         <Image src="/google.png" alt="Google Icon" width={30} height={23} className="bg-white" />
+         <Image src="/google.png" alt="Google Icon" width={30} height={30} className="bg-white" />
           Signin with Google
         </button>
       </form>

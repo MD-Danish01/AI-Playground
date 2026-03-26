@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/connectdb";
 import userSchema from "@/models/user.schema";
 
-export async function POST(requst) {
+export async function POST(request) {
   await connectDB();
 
-  const { username, email } = await requst.json();
+  const token = request.cookies.get('token')?.value || ''
+  console.log('Received token:', token);
+
+  const { username, email } = await request.json();
 
   const User = await userSchema.create({
     username,
