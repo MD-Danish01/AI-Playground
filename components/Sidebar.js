@@ -22,7 +22,7 @@ export default function Sidebar({ collapsed = false, onToggle }) {
   return (
     <aside
       className={`hidden md:flex min-h-screen bg-[#0f1115] border-r border-white/10 text-white flex-col py-5 transition-all duration-200 ${
-        collapsed ? "w-[64px] px-2" : "w-[260px] px-4"
+        collapsed ? "w-16 px-2" : "w-16 px-4"
       }`}
     >
       <div
@@ -51,7 +51,7 @@ export default function Sidebar({ collapsed = false, onToggle }) {
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <span className="text-white/85 flex-shrink-0">
+              <span className="text-white/85 shrink-0">
                 <Icon size={collapsed ? 24 : 20} />
               </span>
               {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
