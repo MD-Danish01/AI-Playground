@@ -8,7 +8,7 @@ const Login = () => {
         className="mx-auto items-center justify-center h-screen w-full flex"
         action={async () => {
           "use server";
-          await signIn("google", {redirectTo: "/chat"});
+          await signIn("google", { redirectTo: "/api/chat/new" });
         }}
       >
         <button

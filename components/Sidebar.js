@@ -21,8 +21,8 @@ const menuItems = [
 export default function Sidebar({ collapsed = false, onToggle }) {
   return (
     <aside
-      className={`hidden md:flex min-h-screen bg-[#393939] border-r border-white/10 text-white flex-col py-5 transition-all duration-200 ${
-        collapsed ? "w-16 px-2" : "w-16 px-4"
+      className={`hidden md:flex min-h-screen bg-[#0f1115] border-r border-white/10 text-white flex-col py-5 transition-all duration-200 ${
+        collapsed ? "w-[64px] px-2" : "w-[260px] px-4"
       }`}
     >
       <div
@@ -30,14 +30,14 @@ export default function Sidebar({ collapsed = false, onToggle }) {
       >
         <button
           className="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 transition-colors"
-          aria-label="Collapse sidebar"
+          aria-label="Toggle sidebar"
           onClick={onToggle}
         >
           <FiSidebar className="mx-auto text-lg" />
         </button>
       </div>
 
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -46,15 +46,15 @@ export default function Sidebar({ collapsed = false, onToggle }) {
               key={item.label}
               className={`flex items-center rounded-lg text-white/92 hover:bg-white/8 transition-colors ${
                 collapsed
-                  ? "justify-center w-10 h-10 mx-auto"
-                  : "gap-3 px-2 py-2 text-left text-lg"
+                  ? "justify-center w-12 h-12 mx-auto"
+                  : "gap-3 px-3 py-2 text-left"
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <span className="w-5 text-center text-sm text-white/85">
-                <Icon />
+              <span className="text-white/85 flex-shrink-0">
+                <Icon size={collapsed ? 24 : 20} />
               </span>
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
             </button>
           );
         })}

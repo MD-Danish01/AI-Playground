@@ -2,14 +2,29 @@ import mongoose from "mongoose";
 
 const ChatSchema = new mongoose.Schema(
   {
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    userId: {
+      type: String,
+      required: true,
+    },
     chatName: {
       type: String,
+      default: "New Chat",
     },
     messages: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
+        role: {
+          type: String,
+          enum: ["user", "assistant"],
+          required: true,
+        },
+        content: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
   },
