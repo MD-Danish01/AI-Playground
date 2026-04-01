@@ -13,28 +13,58 @@ import {
 
 const ChatPage = ({ params }) => {
   const Id = React.use(params);
-  const sessionId = Id.sessonId;
+  const chatId = Id.chatId;
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [messages, setmessages] = useState([]);
   const [input, setinput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [titleChanged, settitleChanged] = useState(0);
+
+  const handelGenerateTitle = async () => {
+    try {
+      const response = await fetch("/api/chat/generatedTitle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: messages,
+          chatId: chatId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (messages.length === 2 || messages.length === 4) {
+      handelGenerateTitle();
+      settitleChanged(titleChanged + 1);
+    }
+  }, [messages]);
 
   useEffect(() => {
     const loadChatData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/chatData?sessionId=${sessionId}`);
-        
+        const response = await fetch(`/api/chat/messages?chatId=${chatId}`);
+
         if (!response.ok) {
           throw new Error("Failed to fetch chat");
         }
-        
+
         const data = await response.json();
-        console.log("📨 Chat data loaded:", data);
-        
-        if (data.chat && data.chat.messages) {
-          setmessages(data.chat.messages);
+
+        if (data.messages) {
+          setmessages(data.messages);
         }
       } catch (error) {
         console.error("❌ Error loading chat:", error);
@@ -43,10 +73,10 @@ const ChatPage = ({ params }) => {
       }
     };
 
-    if (sessionId) {
+    if (chatId) {
       loadChatData();
     }
-  }, [sessionId]);
+  }, [chatId]);
 
   const handelSend = async () => {
     if (!input.trim()) return;
@@ -69,7 +99,7 @@ const ChatPage = ({ params }) => {
         },
         body: JSON.stringify({
           userMessage: userMessage,
-          sessionId: sessionId,
+          chatId: chatId,
         }),
       });
 
@@ -113,13 +143,15 @@ const ChatPage = ({ params }) => {
         <Sidebar
           collapsed={isSidebarCollapsed}
           onToggle={() => setIsSidebarCollapsed((prev) => !prev)}
+          chatId={chatId}
+          titleChanged={titleChanged}
         />
 
         <section className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
           <header className="border-b border-white/10 px-4 md:px-10 py-4 flex items-center justify-start shrink-0">
             <button className="flex items-center gap-2 text-2xl font-semibold text-white/95 hover:opacity-80 transition-opacity">
-              ChatGPT <FiChevronDown className="text-xl text-white/70" />
+              AI Assistance <FiChevronDown className="text-xl text-white/70" />
             </button>
           </header>
 
@@ -189,7 +221,7 @@ const ChatPage = ({ params }) => {
 
           {/* Footer text */}
           <div className="px-4 text-center text-xs text-white/50 py-2 shrink-0">
-            <p>ChatGPT can make mistakes. Check important info.</p>
+            <p>AI Assistance can make mistakes. Check important info.</p>
           </div>
         </section>
       </div>

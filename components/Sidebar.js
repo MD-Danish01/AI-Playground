@@ -1,83 +1,100 @@
-import {
-  FiEdit3,
-  FiGrid,
-  FiHeart,
-  FiImage,
-  FiSearch,
-  FiSidebar,
-  FiUser,
-  FiZap,
-} from "react-icons/fi";
+"use client";
+import { FiPlus, FiMenu, FiUser } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { redirectToNewChat } from "@/actions/redirect";
 
-const menuItems = [
-  { icon: FiEdit3, label: "New chat" },
-  { icon: FiSearch, label: "Search chats" },
-  { icon: FiImage, label: "Images" },
-  { icon: FiGrid, label: "Apps" },
-  { icon: FiZap, label: "Deep research" },
-  { icon: FiHeart, label: "Health" },
-];
+export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
+  const [resent, setresent] = useState([]);
 
-export default function Sidebar({ collapsed = false, onToggle }) {
+  useEffect(() => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    fetch(
+      `http://localhost:3000/api/chat/resent?chatId=${chatId}`,
+      requestOptions,
+    )
+      .then((response) => response.json())
+      .then((result) => setresent(result.resent))
+      .catch((error) => console.error(error));
+  }, [titleChanged]);
+
+  const handleNewChat = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/chat/createNewChat`,
+      );
+      const data = await response.json();
+      await redirectToNewChat(data.chatId);
+    } catch (error) {
+      console.error("Error creating new chat:", error);
+    }
+  };
+
   return (
     <aside
-      className={`hidden md:flex min-h-screen bg-[#0f1115] border-r border-white/10 text-white flex-col py-5 transition-all duration-200 ${
-        collapsed ? "w-16 px-2" : "w-16 px-4"
+      className={`hidden md:flex min-h-screen bg-[#0f1115] border-r border-white/10 text-white flex-col py-5 px-4 transition-all duration-300 ${
+        collapsed ? "w-20" : "w-64"
       }`}
     >
-      <div
-        className={`flex items-center mb-8 ${collapsed ? "justify-center" : "justify-between"}`}
-      >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <button
-          className="w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 transition-colors"
-          aria-label="Toggle sidebar"
           onClick={onToggle}
+          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+          aria-label="Toggle sidebar"
         >
-          <FiSidebar className="mx-auto text-lg" />
+          <FiMenu size={20} className="text-white/70" />
         </button>
+        {!collapsed && (
+          <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <FiPlus size={20} className="text-white/70" />
+          </button>
+        )}
       </div>
 
-      <nav className="flex flex-col gap-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
+      {/* New Chat Button */}
+      <button
+        onClick={() => handleNewChat()}
+        className={`mb-6 flex items-center justify-center gap-3 rounded-lg bg-white/10 hover:bg-white/15 py-3 transition-colors font-medium text-sm ${collapsed ? "px-0" : "px-4"}`}
+      >
+        <FiPlus size={18} className="text-white/80" />
+        {!collapsed && <span>New chat</span>}
+      </button>
 
-          return (
-            <button
-              key={item.label}
-              className={`flex items-center rounded-lg text-white/92 hover:bg-white/8 transition-colors ${
-                collapsed
-                  ? "justify-center w-12 h-12 mx-auto"
-                  : "gap-3 px-3 py-2 text-left"
-              }`}
-              title={collapsed ? item.label : undefined}
-            >
-              <span className="text-white/85 shrink-0">
-                <Icon size={collapsed ? 24 : 20} />
-              </span>
-              {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
-            </button>
-          );
-        })}
-      </nav>
-
-      {collapsed ? (
-        <button className="mt-auto w-10 h-10 rounded-full bg-[#0a84ff] text-white flex items-center justify-center mx-auto">
-          <FiUser className="text-xl" />
-        </button>
-      ) : (
-        <div className="mt-auto rounded-2xl border border-white/12 bg-white/2 p-4">
-          <h3 className="text-white text-lg font-semibold">
-            Get responses tailored to you
-          </h3>
-          <p className="mt-2 text-base text-white/72 leading-relaxed">
-            Log in to get answers based on saved chats, plus create images and
-            upload files.
+      {/* Chat History - Minimal */}
+      {!collapsed && (
+        <div className="flex-1 space-y-2 overflow-y-auto">
+          <p className="px-3 py-2 text-xs font-medium text-white/50 uppercase tracking-wider">
+            Recent
           </p>
-          <button className="mt-4 w-full rounded-full border border-white/18 bg-white/6 py-3 text-base font-semibold hover:bg-white/10 transition-colors">
-            Log in
-          </button>
+          {/* Placeholder for chat items */}
+          <div className="space-y-1">
+            {resent.map((chat, index) => {
+              return (
+                <Link href={`/chat/${chat._id}`} key={index}>
+                  <div className="px-3 py-2 rounded-lg text-sm text-white/70 hover:bg-white/5 cursor-pointer transition-colors truncate">
+                    {chat.chatName}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
+
+      {/* User Section */}
+      <div
+        className={`mt-auto pt-4 border-t border-white/10 flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}
+      >
+        <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+          <FiUser size={18} className="text-white/70" />
+        </button>
+        {!collapsed && <span className="text-sm text-white/70">Account</span>}
+      </div>
     </aside>
   );
 }

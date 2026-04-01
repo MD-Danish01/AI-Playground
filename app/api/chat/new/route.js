@@ -2,12 +2,13 @@ import { auth } from "@/auth";
 import { Chat } from "@/models/chat.schema";
 import connectDB from "@/lib/connectdb";
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session) {
       return NextResponse.redirect(
         new URL("/login", process.env.NEXTAUTH_URL || "http://localhost:3000"),
       );
@@ -15,8 +16,11 @@ export async function GET() {
 
     await connectDB();
 
+    // Convert session.user.id to ObjectId for consistent querying
+    const userId = new mongoose.Types.ObjectId(session.user.id);
+
     const existingChatNewChat = await Chat.findOne({
-      $and: [{ userId: session.user.id }, { chatName: "New Chat" }],
+      $and: [{ userId: userId }, { chatName: "New Chat" }],
     });
 
     if (existingChatNewChat) {
@@ -31,7 +35,7 @@ export async function GET() {
     // Create new chat session
 
     const newChat = await Chat.create({
-      userId: session.user.id,
+      userId: userId,
       chatName: "New Chat",
       messages: [],
     });
