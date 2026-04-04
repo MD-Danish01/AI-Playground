@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Sidebar from "@/components/Sidebar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FiChevronDown,
   FiHelpCircle,
@@ -9,6 +9,7 @@ import {
   FiPlus,
   FiSend,
   FiSettings,
+  FiMenu,
 } from "react-icons/fi";
 import { redirectToNewChat } from "@/actions/redirect";
 
@@ -22,6 +23,10 @@ const ChatPage = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [titleChanged, settitleChanged] = useState(0);
   const [chatName, setchatName] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const messagesContainerRef = useRef(null);
 
   const handelGenerateTitle = async () => {
     try {
@@ -102,6 +107,61 @@ const ChatPage = ({ params }) => {
     }
   }, [chatId]);
 
+  useEffect(() => {
+    const updateKeyboardOffset = () => {
+      if (!window.visualViewport) {
+        setKeyboardOffset(0);
+        return;
+      }
+
+      const viewport = window.visualViewport;
+      const offset = Math.max(
+        0,
+        window.innerHeight - viewport.height - viewport.offsetTop,
+      );
+      setKeyboardOffset(offset);
+    };
+
+    updateKeyboardOffset();
+    window.visualViewport?.addEventListener("resize", updateKeyboardOffset);
+    window.visualViewport?.addEventListener("scroll", updateKeyboardOffset);
+    window.addEventListener("resize", updateKeyboardOffset);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", updateKeyboardOffset);
+      window.visualViewport?.removeEventListener("scroll", updateKeyboardOffset);
+      window.removeEventListener("resize", updateKeyboardOffset);
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const distanceFromBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+      setIsNearBottom(distanceFromBottom < 140);
+    };
+
+    handleScroll();
+    container.addEventListener("scroll", handleScroll);
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container || !isNearBottom) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, isNearBottom]);
+
   const handelSend = async () => {
     if (!input.trim()) return;
 
@@ -177,14 +237,17 @@ const ChatPage = ({ params }) => {
 
         <section className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <header className="border-b border-white/10 px-4 md:px-10 py-4 flex items-center justify-start shrink-0">
+          <header className="border-b border-white/10 pl-16 pr-4 md:px-10 py-4 flex items-center justify-start shrink-0">
             <button className="flex items-center gap-2 text-2xl font-semibold text-white/95 hover:opacity-80 transition-opacity">
-              AI Assistance <FiChevronDown className="text-xl text-white/70" />
+              AI Playground <FiChevronDown className="text-xl text-white/70" />
             </button>
           </header>
 
           {/* Messages Container - Scrollable */}
-          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto pb-36 md:pb-24 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+          >
             {messages.length === 0 ? (
               /* Empty State - Centered */
               <div className="h-full flex flex-col items-center justify-center px-4">
@@ -220,11 +283,15 @@ const ChatPage = ({ params }) => {
 
           {/* Input Bar - Only input sticks to bottom */}
 
-          <div className="w-full max-w-4xl mx-auto rounded-full border border-white/10 bg-white/6 px-5 py-3 sticky bottom-0">
-            <div className="flex items-center gap-3">
+          <div
+            className="fixed md:static left-0 right-0 z-20 px-3 md:px-0"
+            style={{ bottom: isInputFocused ? `${keyboardOffset}px` : "0px" }}
+          >
+            <div className="w-full max-w-4xl mx-auto rounded-full border border-white/10 bg-[#2a2b2f] px-4 md:px-5 py-3 mb-4 md:mb-0">
+              <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={handelCommingSoon}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
               >
                 <FiPlus className="text-xl" />
               </button>
@@ -234,6 +301,8 @@ const ChatPage = ({ params }) => {
                 type="text"
                 value={input}
                 onChange={(e) => setinput(e.target.value)}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && input.trim()) {
                     handelSend();
@@ -242,28 +311,29 @@ const ChatPage = ({ params }) => {
               />
               <button
                 onClick={handelCommingSoon}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
               >
                 <FiMic className="text-xl" />
               </button>
               <button
                 onClick={handelCommingSoon}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
               >
                 <FiSettings className="text-xl" />
               </button>
               <button
                 disabled={!input.trim()}
                 onClick={handelSend}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0 disabled:opacity-40"
               >
                 <FiSend className="text-xl" />
               </button>
             </div>
           </div>
+          </div>
 
           {/* Footer text */}
-          <div className="px-4 text-center text-xs text-white/50 py-2 shrink-0">
+          <div className="hidden md:block px-4 text-center text-xs text-white/50 py-2 shrink-0">
             <p>AI Assistance can make mistakes. Check important info.</p>
           </div>
         </section>

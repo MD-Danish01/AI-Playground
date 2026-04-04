@@ -5,7 +5,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#1F2020] text-white flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 sm:px-10 md:px-16 border-b border-white/10">
-        <h1 className="text-2xl font-semibold tracking-tight">AI Assistant</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">AI Playground</h1>
         <Link href="/login">
           <button className="rounded-full bg-white text-black px-6 py-2 text-sm font-semibold hover:bg-white/90 transition-colors">
             Log in
@@ -17,7 +17,7 @@ export default function Home() {
       <section className="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center sm:px-10">
         <div className="max-w-2xl space-y-6">
           <h2 className="text-5xl sm:text-6xl font-bold leading-tight tracking-tight">
-            Welcome to Your AI Assistant
+            Welcome to Your AI Playground
           </h2>
 
           <p className="text-lg text-white/70 leading-relaxed">
