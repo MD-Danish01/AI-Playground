@@ -10,6 +10,7 @@ import {
   FiSend,
   FiSettings,
 } from "react-icons/fi";
+import { redirectToNewChat } from "@/actions/redirect";
 
 const ChatPage = ({ params }) => {
   const Id = React.use(params);
@@ -20,6 +21,7 @@ const ChatPage = ({ params }) => {
   const [input, setinput] = useState("");
   const [loading, setLoading] = useState(true);
   const [titleChanged, settitleChanged] = useState(0);
+  const [chatName, setchatName] = useState("");
 
   const handelGenerateTitle = async () => {
     try {
@@ -44,8 +46,23 @@ const ChatPage = ({ params }) => {
     }
   };
 
+   const handleNewChat = async () => {
+      try {
+        const response = await fetch(`/api/chat/createNewChat`);
+        const data = await response.json();
+        await redirectToNewChat(data.chatId);
+      } catch (error) {
+        console.error("Error creating new chat:", error);
+      }
+    };
+
   useEffect(() => {
-    if (messages.length === 2 || messages.length === 4) {
+    if (
+      (chatName === "New Chat" ||
+        chatName === "General Discussion" ||
+        chatName === "") &&
+      messages.length > 0
+    ) {
       handelGenerateTitle();
       settitleChanged(titleChanged + 1);
     }
@@ -57,14 +74,21 @@ const ChatPage = ({ params }) => {
         setLoading(true);
         const response = await fetch(`/api/chat/messages?chatId=${chatId}`);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch chat");
+        //if chat not found, create new chat and redirect to this chat
+        if (response.status === 404) {
+          handleNewChat();
+          return;
+        }
+
+        if(!response.ok){
+          throw new Error(`API error: ${response.status}`);
         }
 
         const data = await response.json();
 
         if (data.messages) {
           setmessages(data.messages);
+          setchatName(data.chatName);
         }
       } catch (error) {
         console.error("❌ Error loading chat:", error);
@@ -126,6 +150,10 @@ const ChatPage = ({ params }) => {
     }
   };
 
+  const handelCommingSoon = () => {
+    alert("This feature is coming soon!");
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#1F2020] text-white flex items-center justify-center">
@@ -156,7 +184,7 @@ const ChatPage = ({ params }) => {
           </header>
 
           {/* Messages Container - Scrollable */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {messages.length === 0 ? (
               /* Empty State - Centered */
               <div className="h-full flex flex-col items-center justify-center px-4">
@@ -191,31 +219,46 @@ const ChatPage = ({ params }) => {
           </div>
 
           {/* Input Bar - Only input sticks to bottom */}
-          <div className="px-4 md:px-10 py-4 md:py-6 bg-[#1F2020] shrink-0">
-            <div className="w-full max-w-4xl mx-auto rounded-full border border-white/10 bg-white/6 px-5 py-3">
-              <div className="flex items-center gap-3">
-                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0">
-                  <FiPlus className="text-xl" />
-                </button>
-                <input
-                  className="bg-transparent border-none outline-none flex-1 text-base text-white/90 placeholder:text-white/55"
-                  placeholder="Ask anything"
-                  type="text"
-                  value={input}
-                  onChange={(e) => setinput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handelSend();
-                    }
-                  }}
-                />
-                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0">
-                  <FiMic className="text-xl" />
-                </button>
-                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0">
-                  <FiSettings className="text-xl" />
-                </button>
-              </div>
+
+          <div className="w-full max-w-4xl mx-auto rounded-full border border-white/10 bg-white/6 px-5 py-3 sticky bottom-0">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handelCommingSoon}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+              >
+                <FiPlus className="text-xl" />
+              </button>
+              <input
+                className="bg-transparent border-none outline-none flex-1 text-base text-white/90 placeholder:text-white/55"
+                placeholder="Ask anything"
+                type="text"
+                value={input}
+                onChange={(e) => setinput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && input.trim()) {
+                    handelSend();
+                  }
+                }}
+              />
+              <button
+                onClick={handelCommingSoon}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+              >
+                <FiMic className="text-xl" />
+              </button>
+              <button
+                onClick={handelCommingSoon}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+              >
+                <FiSettings className="text-xl" />
+              </button>
+              <button
+                disabled={!input.trim()}
+                onClick={handelSend}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+              >
+                <FiSend className="text-xl" />
+              </button>
             </div>
           </div>
 

@@ -19,9 +19,10 @@ export default function Home() {
           <h2 className="text-5xl sm:text-6xl font-bold leading-tight tracking-tight">
             Welcome to Your AI Assistant
           </h2>
-          
+
           <p className="text-lg text-white/70 leading-relaxed">
-            A minimal, clean interface built for simplicity. Sign in to get started and unlock the power of AI.
+            A minimal, clean interface built for simplicity. Sign in to get
+            started and unlock the power of AI.
           </p>
 
           <div className="pt-4">

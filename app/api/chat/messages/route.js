@@ -16,6 +16,7 @@ export async function GET(request) {
     }
 
     const chat = await Chat.findById(chatId);
+    const chatName = chat?.chatName || "New Chat";
 
     if (!chat) {
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
@@ -25,10 +26,13 @@ export async function GET(request) {
     //format messages
     let formatedMessages = [];
     formatedMessages = chat.messages.map((msg) => {
-      return { "role": msg.role, "content": msg.content };
+      return { role: msg.role, content: msg.content };
     });
 
-    return NextResponse.json({ messages: formatedMessages }, { status: 200 });
+    return NextResponse.json(
+      { messages: formatedMessages, chatName },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("❌ Error in chatData:", error.message);
     return NextResponse.json(

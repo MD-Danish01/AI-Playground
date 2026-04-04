@@ -4,13 +4,13 @@ import connectDB from "@/lib/connectdb";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-export async function GET() {
+export async function GET(request) {
   try {
     const session = await auth();
 
     if (!session) {
       return NextResponse.redirect(
-        new URL("/login", process.env.NEXTAUTH_URL || "http://localhost:3000"),
+        new URL("/login", request.url),
       );
     }
 
@@ -25,10 +25,7 @@ export async function GET() {
 
     if (existingChatNewChat) {
       return NextResponse.redirect(
-        new URL(
-          `/chat/${existingChatNewChat._id}`,
-          process.env.NEXTAUTH_URL || "http://localhost:3000",
-        ),
+        new URL(`/chat/${existingChatNewChat._id}`, request.url),
       );
     }
 
@@ -41,10 +38,7 @@ export async function GET() {
     });
 
     return NextResponse.redirect(
-      new URL(
-        `/chat/${newChat._id}`,
-        process.env.NEXTAUTH_URL || "http://localhost:3000",
-      ),
+      new URL(`/chat/${newChat._id}`, request.url),
     );
   } catch (error) {
     console.error("Error creating chat:", error);

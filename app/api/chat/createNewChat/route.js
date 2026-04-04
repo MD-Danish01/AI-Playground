@@ -12,7 +12,7 @@ export async function GET(request) {
 
     if (!session) {
       return NextResponse.redirect(
-        new URL("/login", process.env.NEXTAUTH_URL || "http://localhost:3000"),
+        new URL("/login", request.url),
       );
     }
 
