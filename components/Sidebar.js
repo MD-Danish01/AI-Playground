@@ -235,7 +235,7 @@ export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
 
         <div
           onClick={handleShowProfile}
-          className={`mt-auto pt-4 border-t border-white/10 flex items-center gap-3 cursor-pointer ${isExpanded ? "" : "justify-center"}`}
+          className={`fixed md:static mt-auto pt-4 border-t border-white/10 flex items-center gap-3 cursor-pointer ${isExpanded ? "" : "justify-center"}`}
         >
           <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
             {userData?.image ? (
