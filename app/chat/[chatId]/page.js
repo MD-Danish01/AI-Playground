@@ -51,15 +51,15 @@ const ChatPage = ({ params }) => {
     }
   };
 
-   const handleNewChat = async () => {
-      try {
-        const response = await fetch(`/api/chat/createNewChat`);
-        const data = await response.json();
-        await redirectToNewChat(data.chatId);
-      } catch (error) {
-        console.error("Error creating new chat:", error);
-      }
-    };
+  const handleNewChat = async () => {
+    try {
+      const response = await fetch(`/api/chat/createNewChat`);
+      const data = await response.json();
+      await redirectToNewChat(data.chatId);
+    } catch (error) {
+      console.error("Error creating new chat:", error);
+    }
+  };
 
   useEffect(() => {
     if (
@@ -85,7 +85,7 @@ const ChatPage = ({ params }) => {
           return;
         }
 
-        if(!response.ok){
+        if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
         }
 
@@ -96,7 +96,7 @@ const ChatPage = ({ params }) => {
           setchatName(data.chatName);
         }
       } catch (error) {
-        console.error("❌ Error loading chat:", error);
+        console.error("Error loading chat:", error);
       } finally {
         setLoading(false);
       }
@@ -128,8 +128,14 @@ const ChatPage = ({ params }) => {
     window.addEventListener("resize", updateKeyboardOffset);
 
     return () => {
-      window.visualViewport?.removeEventListener("resize", updateKeyboardOffset);
-      window.visualViewport?.removeEventListener("scroll", updateKeyboardOffset);
+      window.visualViewport?.removeEventListener(
+        "resize",
+        updateKeyboardOffset,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        updateKeyboardOffset,
+      );
       window.removeEventListener("resize", updateKeyboardOffset);
     };
   }, []);
@@ -289,47 +295,47 @@ const ChatPage = ({ params }) => {
           >
             <div className="w-full max-w-4xl mx-auto rounded-full border border-white/10 bg-[#2a2b2f] px-4 md:px-5 py-3 mb-4 md:mb-0">
               <div className="flex items-center gap-2 md:gap-3">
-              <button
-                onClick={handelCommingSoon}
-                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
-              >
-                <FiPlus className="text-xl" />
-              </button>
-              <input
-                className="bg-transparent border-none outline-none flex-1 text-base text-white/90 placeholder:text-white/55"
-                placeholder="Ask anything"
-                type="text"
-                value={input}
-                onChange={(e) => setinput(e.target.value)}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && input.trim()) {
-                    handelSend();
-                  }
-                }}
-              />
-              <button
-                onClick={handelCommingSoon}
-                className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
-              >
-                <FiMic className="text-xl" />
-              </button>
-              <button
-                onClick={handelCommingSoon}
-                className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
-              >
-                <FiSettings className="text-xl" />
-              </button>
-              <button
-                disabled={!input.trim()}
-                onClick={handelSend}
-                className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0 disabled:opacity-40"
-              >
-                <FiSend className="text-xl" />
-              </button>
+                <button
+                  onClick={handelCommingSoon}
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                >
+                  <FiPlus className="text-xl" />
+                </button>
+                <input
+                  className="bg-transparent border-none outline-none flex-1 text-base text-white/90 placeholder:text-white/55"
+                  placeholder="Ask anything"
+                  type="text"
+                  value={input}
+                  onChange={(e) => setinput(e.target.value)}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && input.trim()) {
+                      handelSend();
+                    }
+                  }}
+                />
+                <button
+                  onClick={handelCommingSoon}
+                  className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                >
+                  <FiMic className="text-xl" />
+                </button>
+                <button
+                  onClick={handelCommingSoon}
+                  className="hidden md:flex w-10 h-10 rounded-full items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0"
+                >
+                  <FiSettings className="text-xl" />
+                </button>
+                <button
+                  disabled={!input.trim()}
+                  onClick={handelSend}
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10 transition-colors shrink-0 disabled:opacity-40"
+                >
+                  <FiSend className="text-xl" />
+                </button>
+              </div>
             </div>
-          </div>
           </div>
 
           {/* Footer text */}

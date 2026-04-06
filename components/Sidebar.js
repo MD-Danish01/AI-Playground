@@ -119,7 +119,7 @@ export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
 
       {/* Main Sidebar - Desktop & Mobile */}
       <aside
-        className={`fixed md:relative top-0 left-0 min-h-screen bg-[#0f1115] border-r border-white/10 text-white flex flex-col py-5 px-4 transition-transform duration-300 z-40 w-64 ${
+        className={`fixed md:relative top-0 left-0 h-screen max-h-screen bg-[#0f1115] border-r border-white/10 text-white flex flex-col py-5 px-4 transition-transform duration-300 z-40 w-64 ${
           mobileDrawerOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0"
