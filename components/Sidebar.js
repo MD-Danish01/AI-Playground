@@ -119,7 +119,7 @@ export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
 
       {/* Main Sidebar - Desktop & Mobile */}
       <aside
-        className={`fixed md:relative top-0 left-0 h-screen max-h-screen bg-[#0f1115] border-r border-white/10 text-white flex flex-col py-5 px-4 transition-transform duration-300 z-40 w-64 ${
+        className={`fixed md:relative top-0 left-0 h-full max-h-screen bg-[#0f1115] border-r border-white/10 text-white flex flex-col py-5 px-4 transition-transform duration-300 z-40 w-64 ${
           mobileDrawerOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0"
@@ -235,7 +235,7 @@ export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
 
         <div
           onClick={handleShowProfile}
-          className={`fixed md:static mt-auto pt-4 border-t border-white/10 flex items-center gap-3 cursor-pointer ${isExpanded ? "" : "justify-center"}`}
+          className={`pt-4 border-t border-white/10 flex items-center gap-3 cursor-pointer ${isExpanded ? "" : "justify-center"}`}
         >
           <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
             {userData?.image ? (
