@@ -12,7 +12,8 @@ import Link from "next/link";
 import { redirectToNewChat } from "@/actions/redirect";
 import { getProfileData, handleSignOut } from "@/actions/getProfileData";
 
-export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
+export default function Sidebar(props) {
+  const { collapsed, onToggle, chatId, titleChanged } = props;
   const [resent, setresent] = useState([]);
   const [showAccountCard, setShowAccountCard] = useState(false);
   const [userData, setUserData] = useState({});
@@ -162,6 +163,8 @@ export default function Sidebar({ collapsed, onToggle, chatId, titleChanged }) {
             {/* Placeholder for chat items */}
             <div className="space-y-1">
               {resent.map((chat, index) => {
+                //if chat name is New Chat then not show the chat in the recent chats list
+                if (chat.chatName === "New Chat") return null;
                 return (
                   <Link
                     href={`/chat/${chat._id}`}
