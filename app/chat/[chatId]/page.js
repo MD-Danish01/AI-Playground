@@ -1,7 +1,8 @@
 "use client";
 import * as React from "react";
 import Sidebar from "@/components/Sidebar";
-import { useState, useEffect, useRef } from "react";
+import MarkdownMessage from "@/components/MarkdownMessage";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   FiChevronDown,
   FiHelpCircle,
@@ -28,7 +29,7 @@ const ChatPage = ({ params }) => {
   const [isNearBottom, setIsNearBottom] = useState(true);
   const messagesContainerRef = useRef(null);
 
-  const handelGenerateTitle = async () => {
+  const handelGenerateTitle = useCallback(async () => {
     try {
       const response = await fetch("/api/chat/generatedTitle", {
         method: "POST",
@@ -49,7 +50,7 @@ const ChatPage = ({ params }) => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  }, [chatId, messages]);
 
   const handleNewChat = async () => {
     try {
@@ -69,9 +70,9 @@ const ChatPage = ({ params }) => {
       messages.length > 0
     ) {
       handelGenerateTitle();
-      settitleChanged(titleChanged + 1);
+      settitleChanged((prev) => prev + 1);
     }
-  }, [messages]);
+  }, [chatName, handelGenerateTitle, messages]);
 
   useEffect(() => {
     const loadChatData = async () => {
@@ -267,18 +268,22 @@ const ChatPage = ({ params }) => {
                 {messages.map((message, index) => {
                   return message.role === "user" ? (
                     <div key={index} className="flex justify-end">
-                      <div className="bg-white/5 rounded-2xl p-4 max-w-[85%] sm:max-w-[75%] backdrop-blur-sm border border-white/5">
-                        <p className="text-base leading-relaxed text-white/90">
+                      <div className="max-w-[88%] sm:max-w-[74%] rounded-3xl rounded-tr-md border border-white/10 bg-white/5 px-4 py-3 shadow-sm">
+                        <p className="whitespace-pre-wrap text-[15px] leading-7 text-white/90">
                           {message.content}
                         </p>
                       </div>
                     </div>
                   ) : (
                     <div key={index} className="flex justify-start">
-                      <div className="bg-transparent rounded-2xl p-4 max-w-[85%] sm:max-w-[75%]">
-                        <p className="text-base leading-relaxed text-white/95">
-                          {message.content}
-                        </p>
+                      <div className="w-full max-w-[92%] sm:max-w-[78%] rounded-3xl rounded-tl-md border border-white/10 bg-[#15161a] px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+                        <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-white/40">
+                          <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
+                          Assistant
+                        </div>
+                        <div className="text-[15px] leading-7 text-white/95">
+                          <MarkdownMessage content={message.content} />
+                        </div>
                       </div>
                     </div>
                   );
