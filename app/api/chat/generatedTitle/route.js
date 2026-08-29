@@ -40,7 +40,7 @@ export async function POST(request) {
     formatedMessages = await messages.filter((msg) => msg.role === "user");
 
     const response = await groqClient.responses.create({
-      model: "llama-3.1-8b-instant",
+      model: process.env.GROQ_MODEL,
       instructions:
         "You generate chat titles from user messages; return exactly one professional, topic-specific title in plain text only, with no labels, no quotes, no markdown, no emojis, and no extra explanation; the title must be strictly 2 to 4 words, use only clear English words, avoid punctuation except a hyphen only if absolutely necessary, do not start with phrases like Title, The title, or Here is, and if the topic is unclear return exactly General Discussion.",
       input: formatedMessages,
