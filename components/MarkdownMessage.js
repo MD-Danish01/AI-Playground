@@ -40,26 +40,29 @@ export default function MarkdownMessage({ content }) {
       remarkPlugins={[remarkBreaks, remarkGfm]}
       components={{
         p: ({ children }) => (
-          <p className="mb-4 last:mb-0 leading-7 text-white/92">{children}</p>
+          <p className="mb-4 last:mb-0 text-[15px] leading-7 text-white/92">
+            {children}
+          </p>
         ),
         ul: ({ children }) => (
-          <ul className="mb-4 list-disc space-y-2 pl-6 text-white/92 last:mb-0">
+          <ul className="mb-4 list-disc space-y-2 pl-6 text-[15px] leading-7 text-white/92 last:mb-0">
             {children}
           </ul>
         ),
         ol: ({ children }) => (
-          <ol className="mb-4 list-decimal space-y-2 pl-6 text-white/92 last:mb-0">
+          <ol className="mb-4 list-decimal space-y-2 pl-6 text-[15px] leading-7 text-white/92 last:mb-0">
             {children}
           </ol>
         ),
         li: ({ children }) => <li className="pl-1 leading-7">{children}</li>,
         blockquote: ({ children }) => (
-          <blockquote className="mb-4 border-l-2 border-white/20 pl-4 italic text-white/75 last:mb-0">
+          <blockquote className="mb-4 rounded-r-xl border-l-2 border-cyan-300/40 bg-white/5 pl-4 pr-4 py-3 italic text-white/80 last:mb-0">
             {children}
           </blockquote>
         ),
         code: CodeBlock,
         pre: ({ children }) => <>{children}</>,
+        hr: () => <hr className="my-5 border-white/10" />,
         strong: ({ children }) => (
           <strong className="font-semibold text-white/98">{children}</strong>
         ),
@@ -77,6 +80,24 @@ export default function MarkdownMessage({ content }) {
           <h3 className="mb-2 text-lg font-semibold tracking-tight text-white/98 last:mb-0">
             {children}
           </h3>
+        ),
+        table: ({ children }) => (
+          <div className="my-4 overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
+            <table className="w-full border-collapse text-left text-[15px] text-white/90">
+              {children}
+            </table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="bg-white/5">{children}</thead>,
+        th: ({ children }) => (
+          <th className="border-b border-white/10 px-4 py-3 font-semibold text-white/95">
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td className="border-b border-white/10 px-4 py-3 align-top text-white/88">
+            {children}
+          </td>
         ),
         a: ({ children, href }) => (
           <a

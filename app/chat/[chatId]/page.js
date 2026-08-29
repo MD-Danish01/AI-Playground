@@ -5,9 +5,11 @@ import MarkdownMessage from "@/components/MarkdownMessage";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   FiChevronDown,
+  FiCheck,
   FiHelpCircle,
   FiMic,
   FiPlus,
+  FiCopy,
   FiSend,
   FiSettings,
   FiMenu,
@@ -27,6 +29,8 @@ const ChatPage = ({ params }) => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [isNearBottom, setIsNearBottom] = useState(true);
+  const [copiedMessageKey, setCopiedMessageKey] = useState(null);
+  const copiedTimerRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
   const handelGenerateTitle = useCallback(async () => {
@@ -221,6 +225,21 @@ const ChatPage = ({ params }) => {
     alert("This feature is coming soon!");
   };
 
+  const handleCopyMessage = async (message, messageKey) => {
+    try {
+      await navigator.clipboard.writeText(String(message.content ?? ""));
+      setCopiedMessageKey(messageKey);
+      window.clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = window.setTimeout(() => {
+        setCopiedMessageKey((currentKey) =>
+          currentKey === messageKey ? null : currentKey,
+        );
+      }, 1500);
+    } catch (error) {
+      console.error("Error copying message:", error);
+    }
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#1F2020] text-white flex items-center justify-center">
@@ -264,24 +283,50 @@ const ChatPage = ({ params }) => {
               </div>
             ) : (
               /* Messages List */
-              <div className="max-w-3xl mx-auto px-4 md:px-8 py-6 space-y-4">
+              <div className="w-full px-4 md:px-8 lg:px-10 py-6 space-y-4">
                 {messages.map((message, index) => {
+                  const messageKey = `${message.role}-${index}`;
+
                   return message.role === "user" ? (
-                    <div key={index} className="flex justify-end">
-                      <div className="max-w-[88%] sm:max-w-[74%] rounded-3xl rounded-tr-md border border-white/10 bg-white/5 px-4 py-3 shadow-sm">
-                        <p className="whitespace-pre-wrap text-[15px] leading-7 text-white/90">
+                    <div key={index} className="flex w-full justify-end">
+                      <div className="group relative max-w-[88%] sm:max-w-[74%] rounded-3xl rounded-tr-md border border-white/10 bg-white/5 px-4 py-3 shadow-sm transition-colors hover:border-white/15">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyMessage(message, messageKey)}
+                          className="absolute right-3 top-3 rounded-full border border-white/10 bg-[#1b1c20]/90 p-2 text-white/60 opacity-100 shadow-lg transition-all hover:bg-white/10 hover:text-white md:opacity-0 md:group-hover:opacity-100"
+                          aria-label="Copy user message"
+                        >
+                          {copiedMessageKey === messageKey ? (
+                            <FiCheck className="text-sm text-emerald-400" />
+                          ) : (
+                            <FiCopy className="text-sm" />
+                          )}
+                        </button>
+                        <p className="whitespace-pre-wrap pr-10 text-[15px] leading-7 text-white/90">
                           {message.content}
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div key={index} className="flex justify-start">
-                      <div className="w-full max-w-[92%] sm:max-w-[78%] rounded-3xl rounded-tl-md border border-white/10 bg-[#15161a] px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
-                        <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-white/40">
+                    <div key={index} className="flex w-full justify-start">
+                      <div className="group relative w-full rounded-3xl rounded-tl-md border border-white/10 bg-[#15161a] px-4 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition-colors hover:border-white/15">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyMessage(message, messageKey)}
+                          className="absolute right-3 top-3 rounded-full border border-white/10 bg-[#1b1c20]/90 p-2 text-white/60 opacity-100 shadow-lg transition-all hover:bg-white/10 hover:text-white md:opacity-0 md:group-hover:opacity-100"
+                          aria-label="Copy assistant message"
+                        >
+                          {copiedMessageKey === messageKey ? (
+                            <FiCheck className="text-sm text-emerald-400" />
+                          ) : (
+                            <FiCopy className="text-sm" />
+                          )}
+                        </button>
+                        <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-white/40 pr-10">
                           <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
                           Assistant
                         </div>
-                        <div className="text-[15px] leading-7 text-white/95">
+                        <div className="pr-10 text-[15px] leading-7 text-white/95">
                           <MarkdownMessage content={message.content} />
                         </div>
                       </div>
