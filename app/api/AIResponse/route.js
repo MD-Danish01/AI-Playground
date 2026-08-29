@@ -25,7 +25,7 @@ const agent = new Agent({
   name: "AI Assistant",
   instructions:
     "You are a helpful assistant. Answer user questions accurately and concisely.",
-  model: process.env.GROQ_MODEL,
+  model: process.env.GROQ_MODEL || "qwen/qwen3.8-27b",
 });
 
 export async function POST(request) {
